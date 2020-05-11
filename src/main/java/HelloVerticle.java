@@ -4,31 +4,36 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
 
 public class HelloVerticle extends AbstractVerticle {
+    private void handleR1(RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+        response.putHeader("content-type", "text/plain");
+        response.end("hello world");
+    }
+
+    private void handleR2(RoutingContext routingContext) {
+        String word = routingContext.request().getParam("word");
+        HttpServerResponse response = routingContext.response();
+        response.putHeader("content-type", "text/plain");
+        response.end("hello " + word);
+    }
+
+    private void setRoutes(Router router) {
+        router.get("/r1")
+                .handler(this::handleR1);
+
+        router.get("/r2/:word")
+                .handler(this::handleR2);
+    }
+
     @Override
     public void start() {
         HttpServer server = vertx.createHttpServer();
-
         Router router = Router.router(vertx);
-        // routing by exact path
-        Route handler1 = router
-                .get("/r1")
-                .handler(routingContext -> {
-                    HttpServerResponse phrase = routingContext.response();
-                    phrase.putHeader("content-type", "text/plain");
-                    phrase.end("Hello World!");
-                });
-        //Capture path parameter and print
-        Route handler2 = router
-                .get("/r2/:mirror")
-                .handler(routingContext -> {
-                    String mirror = routingContext.request().getParam("mirror");
-                    HttpServerResponse response = routingContext.response();
-                    response.putHeader("content-type", "text/plain");
-                    response.end(mirror);
-                });
-        server.requestHandler(router).listen(8080);
+        setRoutes(router);
+        server.requestHandler(router).listen(9999);
     }
 
     public static void main(String[] args) {
@@ -36,3 +41,5 @@ public class HelloVerticle extends AbstractVerticle {
         vertx.deployVerticle(new HelloVerticle());
     }
 }
+
+
