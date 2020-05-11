@@ -28,6 +28,10 @@ public class HelloVerticle extends AbstractVerticle {
                 .handler(this::handleR2);
     }
 
+    public static int add(int num1, int num2){
+        return num1+num2;
+    }
+
     @Override
     public void start() {
         HttpServer server = vertx.createHttpServer();
