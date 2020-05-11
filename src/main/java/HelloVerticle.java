@@ -7,34 +7,33 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
 public class HelloVerticle extends AbstractVerticle {
-
-    public void handler(RoutingContext routingContext, String resp){
-
-        String respond = "hello world";
-        if(resp != null){
-            respond = resp;
-        }
-
+    private void handleR1(RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
         response.putHeader("content-type", "text/plain");
-        response.end(respond);
+        response.end("hello world");
+    }
 
+    private void handleR2(RoutingContext routingContext) {
+        String word = routingContext.request().getParam("word");
+        HttpServerResponse response = routingContext.response();
+        response.putHeader("content-type", "text/plain");
+        response.end("hello " + word);
+    }
+
+    private void setRoutes(Router router) {
+        router.get("/r1")
+                .handler(this::handleR1);
+
+        router.get("/r2/:word")
+                .handler(this::handleR2);
     }
 
     @Override
     public void start() {
         HttpServer server = vertx.createHttpServer();
         Router router = Router.router(vertx);
-
-        Route handler1 = router
-                .get("/r1")
-                .handler(this::handler());
-
-        Route handler2= router
-                .get("/r2/:word")
-                .handler(this::handler(routingContext.request().getParam("word"))); // this one
-
-        server.requestHandler(router).listen(8080);
+        setRoutes(router);
+        server.requestHandler(router).listen(9999);
     }
 
     public static void main(String[] args) {
