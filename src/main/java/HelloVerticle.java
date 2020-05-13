@@ -2,13 +2,16 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-
 import java.util.HashMap;
+import java.util.Map;
+
 
 public class HelloVerticle extends AbstractVerticle {
+
+    Map<String,String> hashMap = new HashMap<>();
+
     private void handleR1(RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
         response.putHeader("content-type", "text/plain");
@@ -22,7 +25,7 @@ public class HelloVerticle extends AbstractVerticle {
         response.end("hello " + word);
     }
 
-    private void handleR3(RoutingContext routingContext, HashMap<String,String> hashMap) {
+    private void handleR3(RoutingContext routingContext) {
         String key = routingContext.request().getParam("key");
         String value = routingContext.request().getParam("value");
         hashMap.put(key, value);
@@ -31,13 +34,13 @@ public class HelloVerticle extends AbstractVerticle {
         response.end("");
     }
 
-    private void handleR4(RoutingContext routingContext, HashMap<String,String> hashMap) {
+    private void handleR4(RoutingContext routingContext) {
         String text = routingContext.request().getParam("key");
         HttpServerResponse response = routingContext.response();
         response.putHeader("content-type", "text/plain");
         for (String key : hashMap.keySet()) {
             if (key.contains(text)) {
-                System.out.println(hashMap.get(key));
+                response.end(hashMap.get(key));
             }
         }
 
@@ -71,7 +74,7 @@ public class HelloVerticle extends AbstractVerticle {
     }
 
     public static void main(String[] args) {
-        HashMap<String, String> hashMap = new HashMap<>();
+
         Vertx vertx = Vertx.vertx();
         vertx.deployVerticle(new HelloVerticle());
     }
